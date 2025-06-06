@@ -1,5 +1,7 @@
 package com.fullstackofhay.logic;
 
+import java.util.List;
+
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,5 +37,11 @@ public class TemperatureLogic {
   public Temperature addTemperature(Temperature temp) {
     int id = tempDAO.addTemp(temp);
     return tempDAO.getTemp(id);
+  }
+  
+  public List<Temperature> getTemperaturesAbove(int aboveTemp){
+    Temperatures temps = fetchAllTemperatures();
+    List<Temperature> filtered = temps.getTemperatures().stream().filter(temp -> temp.getTemperature() > aboveTemp).toList();
+    return filtered;
   }
 }

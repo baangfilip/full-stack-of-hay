@@ -62,9 +62,7 @@ public class TemperatureResource {
   @Path("temps-above/{above-temp}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response aboveTemp(@PathParam("above-temp") int aboveTemp) {
-    Temperatures temps = temperatureLogic.fetchAllTemperatures();
-    List<Temperature> filtered = temps.getTemperatures().stream().filter(temp -> temp.getTemperature() > aboveTemp).toList();
-    return Response.ok(filtered).build();
+    return Response.ok(temperatureLogic.getTemperaturesAbove(aboveTemp)).build();
   }
 
 
