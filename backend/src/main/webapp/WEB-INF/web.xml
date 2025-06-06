@@ -1,0 +1,16 @@
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         version="10.0">
+  <servlet>
+    <servlet-name>jakarta-servlet-container</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jakarta.ws.rs.Application</param-name>
+      <param-value>com.fullstackofhay.AppResourceConfig</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>jakarta-servlet-container</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
+</web-app>
