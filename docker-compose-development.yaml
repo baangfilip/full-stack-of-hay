@@ -1,4 +1,39 @@
 services:
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+  # backend:
+  #   depends_on:
+  #     - db
+  #     - broker
+  #   volumes:
+  #     - ./container-resources/backend/tomcat/logging.properties:/usr/local/tomcat/conf/logging.properties
+  #     - ./container-resources/backend/jrebel/jrebel.jar:/jrebel.jar 
+  #     - ./container-resources/backend/jrebel/lib/libjrebel64.so:/lib/libjrebel64.so
+  #     - ./backend/target/backend.war:/usr/local/tomcat/webapps/ROOT.war
+  #   build: 
+  #     dockerfile: ./backend/Dockerfile.development
+  #   environment:
+  #     JAVA_OPTS: "-agentpath:/lib/libjrebel64.so -Drebel.remoting_plugin=true -Drebel.log.file=/jrebel.log -Dsupplements.host=supplements"
+  #   ports:
+  #     - "8888:8080"
+  mqtt5:
+    image: eclipse-mosquitto
+    container_name: mqtt5
+    ports:
+      - "1883:1883" #default mqtt port
+      - "9001:9001" #default mqtt port for websockets
+    volumes:
+      - ./container-resources/mqtt/config:/mosquitto/config:rw
+      - ./container-resources/mqtt/data:/mosquitto/data:rw
+      - ./container-resources/mqtt/log:/mosquitto/log:rw
+    restart: unless-stopped
+  # mqtt-kafka-bridge:
+  #   build: ./mqtt-kafka-bridge
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - broker
   broker:
     image: confluentinc/confluent-local:7.4.1
     hostname: broker
@@ -24,7 +59,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest 
     environment:
       - "ACCEPT_EULA=Y"
-      - "MSSQL_SA_PASSWORD=1111ubersakYTA(-_!)33333"
+      - "MSSQL_SA_PASSWORD=1111ubersakYTA(-_!)33333" #dont even think this is prod
       - "MSSQL_PID=Express"
       - "MSSQL_AGENT_ENABLED=false"
     volumes:

@@ -16,8 +16,10 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.fullstackofhay.logic.TemperatureLogic;
+import com.fullstackofhay.logic.VoltageLogic;
 import com.google.gson.Gson;
 import com.fullstackofhay.dao.TemperatureDAO;
+import com.fullstackofhay.dao.VoltageDAO;
 import com.fullstackofhay.logic.KafkaConsumerService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -38,7 +40,7 @@ public class AppResourceConfig extends ResourceConfig {
     register(JacksonFeature.class);
 
     register(new AbstractBinder() {
-      @Override
+      @Override 
       protected void configure() {
         Config cfg = ConfigFactory.load();
         HikariConfig hc = new HikariConfig();
@@ -59,10 +61,14 @@ public class AppResourceConfig extends ResourceConfig {
             .in(Singleton.class);
 
         bind(TemperatureLogic.class)
-          .to(TemperatureLogic.class)
+          .to(TemperatureLogic.class);
+        bind(VoltageLogic.class)
+          .to(VoltageLogic.class)
           .in(Singleton.class);
         bind(TemperatureDAO.class)
-          .to(TemperatureDAO.class)
+          .to(TemperatureDAO.class);
+        bind(VoltageDAO.class)
+          .to(VoltageDAO.class)
           .in(Singleton.class);
         bindAsContract(KafkaConsumerService.class)
           .in(Immediate.class);

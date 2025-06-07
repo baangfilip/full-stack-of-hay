@@ -17,39 +17,39 @@ import org.slf4j.LoggerFactory;
 
 import com.fullstackofhay.entities.TemperatureRecord;
 import com.fullstackofhay.entities.Temperatures;
-import com.fullstackofhay.logic.TemperatureLogic;
+import com.fullstackofhay.entities.VoltageRecord;
+import com.fullstackofhay.logic.VoltageLogic;
 
-@Path("/temperature")
-public class TemperatureResource {
+@Path("/voltage")
+public class VoltageResource {
     private static final Logger log =
         LoggerFactory.getLogger(TemperatureResource.class);
   private final Producer producer;
-  private final TemperatureLogic temperatureLogic;
+  private final VoltageLogic voltageLogic;
 
   @Inject
-  public TemperatureResource(Producer producer,
-                       TemperatureLogic temperatureLogic) {
+  public VoltageResource(Producer producer,
+                       VoltageLogic voltageLogic) {
     this.producer = producer;
-    this.temperatureLogic = temperatureLogic;
+    this.voltageLogic = voltageLogic;
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public Response getTemps() {
-    Temperatures temps = temperatureLogic.fetchAllTemperatures();
-    return Response.ok(temps).build();
+    return Response.ok(voltageLogic.fetchAllVoltages()).build();
   }
 
   @GET
-  @Path("spam-temps/{amount}")
+  @Path("spam-voltages/{amount}")
   @Produces(MediaType.TEXT_PLAIN)
   public Response spamTemps(@PathParam("amount") int amount) {
-    log.info("spam temps");
+    log.info("spam volt");
     for(int i = 0; i < amount; i++){
       double tempCelsius = Math.random() * 30 + 1;
-      producer.send(new org.apache.kafka.clients.producer.ProducerRecord<>("incoming-temperatures","","{\n" + //
+      producer.send(new org.apache.kafka.clients.producer.ProducerRecord<>("incoming-voltage","","{\n" + //
       "\t\"sensordate\": \"2025-12-12 12:12:12\",\n" + //
-      "\t\"temperature\": "+tempCelsius+",\n" + //
+      "\t\"voltage\": "+tempCelsius+",\n" + //
       "\t\"messageID\": "+i+"\n" + //
               "}"));
       log.info("spammed message", i);
@@ -58,10 +58,10 @@ public class TemperatureResource {
   }
 
   @GET
-  @Path("temps-above/{above-temp}")
+  @Path("voltage-above/{above-volt}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response aboveTemp(@PathParam("above-temp") int aboveTemp) {
-    return Response.ok(temperatureLogic.getTemperaturesAbove(aboveTemp)).build();
+  public Response aboveTemp(@PathParam("above-volt") int aboveVolt) {
+    return Response.ok(voltageLogic.getVoltagesAbove(aboveVolt)).build();
   }
 
 
@@ -69,9 +69,9 @@ public class TemperatureResource {
   @Path("/add")
   @Produces(MediaType.APPLICATION_JSON)
   public Response addTemp() {
-    double tempCelsius = Math.random() * 30 + 1;
-    TemperatureRecord newtemp = new TemperatureRecord(0, (float) tempCelsius, new Date(System.currentTimeMillis()), null);
-    TemperatureRecord temp = temperatureLogic.addTemperature(newtemp);
+    double voltage = Math.random() * 30 + 1;
+    VoltageRecord newvolt = new VoltageRecord(0, (float) voltage, new Date(System.currentTimeMillis()), null);
+    VoltageRecord temp = voltageLogic.addVoltage(newvolt);
     return Response.ok(temp).build();
   }
 }

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fullstackofhay.entities.TemperatureRecord;
+import com.fullstackofhay.entities.VoltageRecord;
 import com.google.gson.Gson;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -31,11 +32,13 @@ public class KafkaConsumerService {
     private final Thread        thread;
     private final AtomicBoolean running = new AtomicBoolean(true);
     private final TemperatureLogic tempLogic;
+    private final VoltageLogic voltLogic;
     @Inject
     private Gson gson;
     @Inject
-    public KafkaConsumerService(TemperatureLogic tempLogic) {
+    public KafkaConsumerService(TemperatureLogic tempLogic, VoltageLogic voltLogic) {
         this.tempLogic = tempLogic;
+        this.voltLogic = voltLogic;
         Config cfg = ConfigFactory.load();
         Properties pc = new Properties();
         pc.put("bootstrap.servers", cfg.getString("kafka.bootstrap.servers"));
@@ -43,7 +46,7 @@ public class KafkaConsumerService {
         pc.put("key.deserializer",   "org.apache.kafka.common.serialization.StringDeserializer");
         pc.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         this.consumer = new KafkaConsumer<>(pc);
-        this.consumer.subscribe(List.of("incoming-temperatures"));
+        this.consumer.subscribe(List.of("incoming-temperatures", "incoming-voltage"));
         this.thread = new Thread(this::pollLoop, "kafka-consumer-thread");
         this.thread.setDaemon(true);
     }
@@ -83,6 +86,14 @@ public class KafkaConsumerService {
                 tempLogic.addTemperature(temp);
             }catch(Exception e){
                 log.info("Couldnt parse message value to tempareature", record.value());
+                e.printStackTrace();
+            }
+        }else if(record.topic().equals("incoming-voltage")){
+            try{
+                VoltageRecord temp = gson.fromJson(record.value(), VoltageRecord.class);
+                voltLogic.addVoltage(temp);
+            }catch(Exception e){
+                log.info("Couldnt parse message value to voltage", record.value());
                 e.printStackTrace();
             }
         }
