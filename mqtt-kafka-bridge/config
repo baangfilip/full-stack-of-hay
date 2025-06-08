@@ -1,0 +1,11 @@
+[MQTT]
+user = user
+password = password
+host = localhost
+port = 1883
+
+[KAFKA]
+host = localhost
+port = 9092
+temptopic = incoming-temperatures
+voltagetopic = incoming-voltage

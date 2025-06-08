@@ -4,6 +4,7 @@ import time
 
 mqtt_broker = 'localhost'
 connected = False
+sensorid = "0a354dfb-c9da-4fd7-8ca5-e72890f1ee53"
 
 def on_connect(client, userdata, flags, reason_code, properties):
     global connected
@@ -28,7 +29,8 @@ while True:
         randTemperature = uniform(20.0, 21.0)
         randVoltage = uniform(3.4, 5.5)
         timems = float(time.time_ns() / 1000000)
-        payload = f"{randTemperature},{randVoltage},{timems}"
+        friendlyName = "fake-sensor"
+        payload = f"{randTemperature},{randVoltage},{timems},{friendlyName},{sensorid}"
         mqtt_client.publish("sensor", payload)
         print('MQTT: Just published ' + payload + ' to topic sensor')
     else:
