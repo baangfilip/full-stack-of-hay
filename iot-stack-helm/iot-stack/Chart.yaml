@@ -1,0 +1,4 @@
+apiVersion: v2
+name: iot-stack
+description: A Helm chart to deploy InfluxDB 1.8, Telegraf, Mosquitto, and Grafana
+version: 0.1.0

@@ -1,0 +1,96 @@
+# monitoring/values.yaml
+
+# =============================================================================
+# Umbrella‐level settings (for NOTES, tests, etc.)
+# =============================================================================
+service:
+  type: ClusterIP
+  port: 8086
+
+ingress:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+serviceAccount:
+  create: true
+# =============================================================================
+# InfluxDB sub‐chart (https://helm.influxdata.com/)
+# =============================================================================
+influxdb:
+  enabled: true
+  image:
+    repository: influxdb
+    tag: "1.8.10"           # drop “-alpine”
+    pullPolicy: IfNotPresent
+  persistence:
+    enabled: true
+    size: 10Gi
+  adminUser:
+    enabled: true
+    user: user
+    password: password
+  service:
+    type: ClusterIP
+    port: 8086
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+# =============================================================================
+# Telegraf sub‐chart (https://helm.influxdata.com/)
+# =============================================================================
+telegraf-ds:
+  enabled: true
+  daemonset:
+    enabled: true
+  image:
+    tag: "1.27"
+    pullPolicy: IfNotPresent
+  agents:
+    interval: "15s"
+
+  # All Telegraf config lives under “config:”
+  config:
+    # REMOVE Docker (k3s uses containerd)
+    docker_endpoint: ""
+    outputs:
+      - influxdb:
+          urls:
+            - http://monitoring-influxdb.monitoring.svc:8086
+          database: telegraf
+          username: user
+          password: password
+  inputs:
+    # Explicitly disable Docker
+    docker:
+      enabled: false
+
+    # Node-level metrics
+    cpu:
+      enabled: true
+      percpu: true
+      totalcpu: true
+    mem:
+      enabled: true
+    disk:
+      enabled: true
+      devices:
+        - "*"
+    net:
+      enabled: true
+
+    # Kubernetes metrics
+    kubernetes:
+      enabled: true
+    kubernetes_pod:
+      enabled: true
+
+  # RBAC / ServiceAccount for the DaemonSet
+  serviceAccount:
+    create: true
+    name: telegraf-monitor
+  rbac:
+    create: true

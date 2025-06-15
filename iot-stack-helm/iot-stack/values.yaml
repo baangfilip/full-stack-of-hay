@@ -1,0 +1,29 @@
+influxdb:
+  image: influxdb:1.8
+  storageSize: 1Gi
+  service:
+    port: 8086
+
+grafana:
+  image: grafana/grafana-enterprise
+  adminPassword: admin
+  service:
+    port: 3000
+  ingress:
+    enabled: true
+    host: grafana.homelab.lan
+
+mosquitto:
+  image: eclipse-mosquitto
+  service:
+    port: 1883
+
+telegraf:
+  image: telegraf:latest
+  mqtt:
+    broker: tcp://mosquitto:1883
+    topics:
+      - sensors/+/temp
+  influxdb:
+    url: http://influxdb:8086
+    database: telegraf

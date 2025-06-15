@@ -3,3 +3,6 @@
 **/mqtt-kafka-bridge-venv
 **/fake-device/venv
 **/pwfile
+
+**/grafana_data/
+**/influxdb_data/
